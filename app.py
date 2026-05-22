@@ -141,3 +141,23 @@ def generate_lesson_plan(manager_name, teacher_name, subject, topic,
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
+@app.route('/api/units/<grade>/<subject>')
+def get_units(grade, subject):
+    # Хэрэв вэбээс "7-р анги" гэж орж ирвэл зөвхөн "7" гэдэг тоог нь салгаж авна
+    grade_key = grade.split('-')[0].strip()
+    
+    # JSON-оос тухайн ангийн өгөгдлийг хайх
+    grade_data = CURRICULUM['grades'].get(grade_key, {})
+    
+    # Тухайн хичээлийн өгөгдлийг хайх
+    subject_data = grade_data.get('subjects', {}).get(subject, {})
+    
+    # Хичээл доторх 'units' (Нэгж хичээлүүд)-ийг авах
+    units = subject_data.get('units', [])
+    
+    # Жагсаалтыг JavaScript-рүү JSON хэлбэрээр буцаана
+    return jsonify(units)
+
+if __name__ == '__main__':
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
