@@ -51,7 +51,7 @@ html,body{height:100%;font-family:'IBM Plex Sans',sans-serif;background:var(--bg
 .mt-6{margin-top:6px;}
 
 /* ── НЭГЖ / ЭЭЛЖИТ ТАБ ── */
-.topic-tabs{display:flex;border-radius:8px;overflow:hidden;border:1px solid var(--border);}
+.topic-tabs{display:flex;border-radius:8px;overflow:hidden;border:1px solid var(--border);margin-bottom:6px;}
 .topic-tab{flex:1;padding:8px 0;background:#fff;border:none;font-size:12px;font-weight:600;color:var(--text-muted);cursor:pointer;transition:all .15s;font-family:'IBM Plex Sans',sans-serif;}
 .topic-tab:first-child{border-right:1px solid var(--border);}
 .topic-tab.active{background:var(--accent);color:#fff;}
@@ -190,9 +190,6 @@ html,body{height:100%;font-family:'IBM Plex Sans',sans-serif;background:var(--bg
         </div>
       </div>
 
-      <!-- ═══════════════════════════════════════════
-           ХИЧЭЭЛИЙН СЭДЭВ — НЭГЖ / ЭЭЛЖИТ ТАБ
-      ═══════════════════════════════════════════ -->
       <div class="form-section">
         <label class="form-label">Хичээлийн сэдэв</label>
 
@@ -205,23 +202,21 @@ html,body{height:100%;font-family:'IBM Plex Sans',sans-serif;background:var(--bg
           </button>
         </div>
 
-        <!-- Нэгж хичээл панел -->
         <div class="topic-panel show" id="panel-negj">
           <div class="select-wrap">
-            <select id="unitSelect" class="form-select" onchange="onUnitChange('negj')" disabled>
+            <select id="unitSelect" class="form-select" disabled>
               <option value="">— Нэгж сонгоно уу —</option>
             </select>
           </div>
         </div>
 
-        <!-- Ээлжит хичээл панел -->
         <div class="topic-panel" id="panel-eeljit">
           <div class="select-wrap">
             <select id="unitSelect2" class="form-select" onchange="onUnitChange('eeljit')" disabled>
-              <option value="">— Нэгж сонгоно уу —</option>
+              <option value="">— Эхлээд Нэгж сонгоно уу —</option>
             </select>
           </div>
-          <div class="select-wrap">
+          <div class="select-wrap" id="lessonSelectContainer" style="margin-top: 8px; display: none;">
             <select id="lessonSelect" class="form-select" disabled>
               <option value="">— Ээлжит хичээл сонгоно уу —</option>
             </select>
@@ -231,8 +226,6 @@ html,body{height:100%;font-family:'IBM Plex Sans',sans-serif;background:var(--bg
         <input type="text" id="topicCustom" class="form-input mt-6"
                placeholder="Эсвэл өөрийн сэдэв бичнэ үү...">
       </div>
-      <!-- ═══════════════════════════════════════════ -->
-
       <div class="form-section">
         <label class="form-label">Хугацаа</label>
         <div class="select-wrap">
@@ -271,7 +264,7 @@ html,body{height:100%;font-family:'IBM Plex Sans',sans-serif;background:var(--bg
     <div class="hidden" id="planOutput">
       <div class="plan-actions">
         <button class="action-btn" onclick="window.print()">🖨️ Хэвлэх</button>
-        <button class="action-btn" onclick="copyText()">📋 Хуулах</button>
+        <button class="action-btn" onclick="copyText(event)">📋 Хуулах</button>
         <button class="action-btn secondary" onclick="resetForm()">🔄 Шинэчлэх</button>
       </div>
       <div id="planContent"></div>
@@ -304,7 +297,7 @@ function onGradeChange() {
 }
 
 // ================================================================
-// SUBJECT → UNITS
+// SUBJECT → UNITS (Хоёр табд зөв уншуулж тохируулах)
 // ================================================================
 function onSubjectChange() {
   resetTopics();
@@ -313,20 +306,31 @@ function onSubjectChange() {
   if (!grade || !subject) return;
 
   const units = CURRICULUM[grade].subjects[subject].units;
-  ['unitSelect','unitSelect2'].forEach(id => {
-    const sel = document.getElementById(id);
-    sel.innerHTML = '<option value="">— Нэгж сонгоно уу —</option>';
-    units.forEach((u, i) => {
-      const o = document.createElement('option');
-      o.value = i; o.textContent = u.title;
-      sel.appendChild(o);
-    });
-    sel.disabled = false;
+  
+  // 1. Нэгж хичээлийн таб дахь сонголт
+  const unitSel1 = document.getElementById('unitSelect');
+  unitSel1.innerHTML = '<option value="">— Нэгж сонгоно уу —</option>';
+  
+  // 2. Ээлжит хичээлийн таб дахь сонголт
+  const unitSel2 = document.getElementById('unitSelect2');
+  unitSel2.innerHTML = '<option value="">— Эхлээд Нэгж сонгоно уу —</option>';
+
+  units.forEach((u, i) => {
+    const o1 = document.createElement('option');
+    o1.value = i; o1.textContent = u.title;
+    unitSel1.appendChild(o1);
+
+    const o2 = document.createElement('option');
+    o2.value = i; o2.textContent = u.title;
+    unitSel2.appendChild(o2);
   });
+  
+  unitSel1.disabled = false;
+  unitSel2.disabled = false;
 }
 
 // ================================================================
-// UNIT → LESSONS  (зөвхөн ээлжит табд)
+// UNIT → LESSONS  (Ээлжит хичээл сонгох хэсгийг урсгалаар нээх)
 // ================================================================
 function onUnitChange(tab) {
   if (tab !== 'eeljit') return;
@@ -334,10 +338,15 @@ function onUnitChange(tab) {
   const subject = document.getElementById('subjectSelect').value;
   const idx     = document.getElementById('unitSelect2').value;
   const lessSel = document.getElementById('lessonSelect');
+  const lessContainer = document.getElementById('lessonSelectContainer');
 
   lessSel.innerHTML = '<option value="">— Ээлжит хичээл сонгоно уу —</option>';
   lessSel.disabled = true;
-  if (idx === '' || !grade || !subject) return;
+  
+  if (idx === '' || !grade || !subject) {
+    lessContainer.style.display = 'none';
+    return;
+  }
 
   const lessons = CURRICULUM[grade].subjects[subject].units[idx].lessons;
   lessons.forEach(l => {
@@ -345,22 +354,29 @@ function onUnitChange(tab) {
     o.value = l; o.textContent = l;
     lessSel.appendChild(o);
   });
+  
   lessSel.disabled = false;
+  lessContainer.style.display = 'block'; // Нэгж сонгогдсон үед Ээлжит цонхыг ил гаргана
 }
 
 function resetTopics() {
-  ['unitSelect','unitSelect2'].forEach(id => {
-    const el = document.getElementById(id);
-    el.innerHTML = '<option value="">— Нэгж сонгоно уу —</option>';
-    el.disabled = true;
-  });
+  const unitSel1 = document.getElementById('unitSelect');
+  unitSel1.innerHTML = '<option value="">— Нэгж сонгоно уу —</option>';
+  unitSel1.disabled = true;
+
+  const unitSel2 = document.getElementById('unitSelect2');
+  unitSel2.innerHTML = '<option value="">— Эхлээд Нэгж сонгоно уу —</option>';
+  unitSel2.disabled = true;
+
   const ls = document.getElementById('lessonSelect');
   ls.innerHTML = '<option value="">— Ээлжит хичээл сонгоно уу —</option>';
   ls.disabled = true;
+  
+  document.getElementById('lessonSelectContainer').style.display = 'none';
 }
 
 // ================================================================
-// TAB SWITCH
+// TAB SWITCH (Таб солиход утгуудыг цэвэрлэж зөрчилгүй болгох)
 // ================================================================
 function switchTab(tab) {
   activeTab = tab;
@@ -368,6 +384,15 @@ function switchTab(tab) {
   document.getElementById('tab-eeljit').classList.toggle('active', tab === 'eeljit');
   document.getElementById('panel-negj').classList.toggle('show', tab === 'negj');
   document.getElementById('panel-eeljit').classList.toggle('show', tab === 'eeljit');
+  
+  // Таб солигдох үед нөгөө табын сонголтыг хоосон болгоно
+  if (tab === 'negj') {
+    document.getElementById('unitSelect2').value = "";
+    document.getElementById('lessonSelect').value = "";
+    document.getElementById('lessonSelectContainer').style.display = 'none';
+  } else {
+    document.getElementById('unitSelect').value = "";
+  }
 }
 
 // ================================================================
@@ -396,7 +421,7 @@ function getTopicInfo() {
 }
 
 // ================================================================
-// GENERATE  — Flask /api/generate руу POST хийнэ
+// GENERATE — Flask /api/generate руу POST хийнэ
 // ================================================================
 async function generatePlan() {
   const grade      = document.getElementById('gradeSelect').value;
@@ -538,10 +563,11 @@ function showState(s) {
   if (s === 'output')  document.getElementById('planOutput').classList.remove('hidden');
 }
 
-function copyText() {
+function copyText(event) {
+  const btn = event ? event.target : window.event.target;
   navigator.clipboard.writeText(document.getElementById('planContent').innerText).then(() => {
-    const b = event.target; b.textContent = '✅ Хуулагдлаа!';
-    setTimeout(() => b.textContent = '📋 Хуулах', 2000);
+    btn.textContent = '✅ Хуулагдлаа!';
+    setTimeout(() => btn.textContent = '📋 Хуулах', 2000);
   });
 }
 
