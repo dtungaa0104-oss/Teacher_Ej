@@ -46,10 +46,12 @@ html,body{height:100%;font-family:'IBM Plex Sans',sans-serif;background:var(--bg
 .select-wrap{position:relative;}
 .select-wrap::after{content:'';position:absolute;right:12px;top:50%;transform:translateY(-50%);width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;border-top:5px solid var(--text-muted);pointer-events:none;}
 .mt-6{margin-top:6px;}
-
-
+.section-divider{border:none;border-top:1px dashed var(--border);margin:4px 0;}
+.sub-label{font-size:9px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--accent);padding:6px 0 2px;display:flex;align-items:center;gap:6px;}
+.sub-label::before{content:'';display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);opacity:.5;}
 .generate-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:13px;background:linear-gradient(135deg,var(--accent),#7c5af5);border:none;border-radius:10px;color:#fff;font-family:'IBM Plex Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all .3s;margin-top:4px;}
 .generate-btn:hover{background:linear-gradient(135deg,var(--accent-hover),#6a48e0);transform:translateY(-1px);box-shadow:0 8px 24px rgba(79,110,247,.3);}
+.generate-btn:disabled{opacity:.6;cursor:not-allowed;transform:none;box-shadow:none;}
 .output-panel{flex:1;overflow-y:auto;background:var(--bg-primary);}
 .output-panel::-webkit-scrollbar{width:6px;}
 .output-panel::-webkit-scrollbar-thumb{background:#cdd3e0;border-radius:3px;}
@@ -59,6 +61,7 @@ html,body{height:100%;font-family:'IBM Plex Sans',sans-serif;background:var(--bg
 .empty-desc{font-size:14px;color:var(--text-muted);max-width:380px;line-height:1.7;}
 .loading-state{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:20px;color:var(--text-secondary);}
 .loader-ring{width:48px;height:48px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;}
+.loading-tip{font-size:12px;color:var(--text-muted);max-width:280px;text-align:center;line-height:1.6;}
 .plan-actions{position:sticky;top:0;z-index:10;display:flex;gap:8px;padding:12px 32px;background:rgba(244,246,251,.95);backdrop-filter:blur(8px);border-bottom:1px solid var(--border);}
 .action-btn{padding:7px 16px;border-radius:7px;border:1px solid var(--border);background:#fff;color:var(--text-primary);font-family:'IBM Plex Sans',sans-serif;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s;}
 .action-btn:hover{background:var(--accent);border-color:var(--accent);color:#fff;}
@@ -105,6 +108,7 @@ html,body{height:100%;font-family:'IBM Plex Sans',sans-serif;background:var(--bg
 .diff-card{background:#f8f9fc;border-radius:8px;padding:14px;border:1px solid var(--border);}
 .diff-label{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px;}
 .diff-text{font-size:12px;color:var(--text-secondary);line-height:1.7;}
+.fallback-notice{background:#fff8e1;border:1px solid #ffe082;border-radius:8px;padding:10px 14px;font-size:12px;color:#e65100;margin-bottom:16px;}
 .hidden{display:none!important;}
 @keyframes slideUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
 @keyframes spin{to{transform:rotate(360deg);}}
@@ -175,27 +179,30 @@ html,body{height:100%;font-family:'IBM Plex Sans',sans-serif;background:var(--bg
         </div>
       </div>
 
-      <!-- ══════════════════════════════════════════
-           ХИЧЭЭЛИЙН СЭДЭВ: НЭГЖ → ЭЭЛЖИТ
-      ══════════════════════════════════════════ -->
+      <!-- НЭГЖ ХИЧЭЭЛИЙН СЭДЭВ -->
       <div class="form-section">
-        <label class="form-label">Нэгж хичээлийн сэдэв</label>
+        <span class="sub-label">Нэгж хичээлийн сэдэв</span>
         <div class="select-wrap">
           <select id="unitSelect" class="form-select" onchange="onUnitChange()" disabled>
-            <option value="">— Нэгж сонгоно уу —</option>
+            <option value="">— Эхлээд хичээл сонгоно уу —</option>
           </select>
         </div>
       </div>
 
+      <!-- ЭЭЛЖИТ ХИЧЭЭЛИЙН СЭДЭВ (нэгж сонгосны дараа гарна) -->
       <div class="form-section" id="lessonSection" style="display:none;">
-        <label class="form-label">Ээлжит хичээлийн сэдэв</label>
+        <span class="sub-label">Ээлжит хичээлийн сэдэв</span>
         <div class="select-wrap">
           <select id="lessonSelect" class="form-select" disabled>
             <option value="">— Ээлжит хичээл сонгоно уу —</option>
           </select>
         </div>
       </div>
-      <!-- ══════════════════════════════════════════ -->
+
+      <div class="form-section">
+        <label class="form-label" style="color:var(--text-muted);font-style:italic;">Эсвэл өөрийн сэдэв бичнэ үү</label>
+        <input type="text" id="topicCustom" class="form-input" placeholder="Жишээ нь: Цахим аюулгүй байдал...">
+      </div>
 
       <div class="form-section">
         <label class="form-label">Хугацаа</label>
@@ -214,7 +221,7 @@ html,body{height:100%;font-family:'IBM Plex Sans',sans-serif;background:var(--bg
           placeholder="Сурагч энэ хичээлийн дараа юуг мэдэж, хийж чадах болох..."></textarea>
       </div>
 
-      <button class="generate-btn" onclick="generatePlan()">
+      <button class="generate-btn" id="generateBtn" onclick="generatePlan()">
         <span>✦</span> AI-аар хөтөлбөр үүсгэх
       </button>
 
@@ -226,11 +233,12 @@ html,body{height:100%;font-family:'IBM Plex Sans',sans-serif;background:var(--bg
       <div class="empty-icon">📄</div>
       <h3 class="empty-title">Хөтөлбөр үүсгэхэд бэлэн</h3>
       <p class="empty-desc">Зүүн талын маягтыг бөглөөд товч дарна уу.<br>
-        A4 хэвлэхэд бэлэн хөтөлбөр хэдэн секундэд гарна.</p>
+        Монгол хэл, A4 хэвлэхэд бэлэн хөтөлбөр үүснэ.</p>
     </div>
     <div class="loading-state hidden" id="loadingState">
       <div class="loader-ring"></div>
-      <p>Хөтөлбөр боловсруулж байна...</p>
+      <p style="font-weight:600;">AI хөтөлбөр боловсруулж байна...</p>
+      <p class="loading-tip">Bloom-ийн таксономи, Discovery Learning аргаар дэлгэрэнгүй хөтөлбөр үүсгэж байна. Түр хүлээнэ үү.</p>
     </div>
     <div class="hidden" id="planOutput">
       <div class="plan-actions">
@@ -274,7 +282,6 @@ function onSubjectChange() {
   const grade   = document.getElementById('gradeSelect').value;
   const subject = document.getElementById('subjectSelect').value;
   if (!grade || !subject) return;
-
   const units = CURRICULUM[grade].subjects[subject].units;
   const u = document.getElementById('unitSelect');
   u.innerHTML = '<option value="">— Нэгж сонгоно уу —</option>';
@@ -287,22 +294,18 @@ function onSubjectChange() {
 }
 
 // ================================================================
-// НЭГЖ СОНГОГДСОНЫ ДАРАА → ЭЭЛЖИТ ГАРНА
+// НЭГЖ → ЭЭЛЖИТ
 // ================================================================
 function onUnitChange() {
   const grade   = document.getElementById('gradeSelect').value;
   const subject = document.getElementById('subjectSelect').value;
   const idx     = document.getElementById('unitSelect').value;
-
-  const lessSel     = document.getElementById('lessonSelect');
+  const lessSel = document.getElementById('lessonSelect');
   const lessSection = document.getElementById('lessonSection');
-
   lessSel.innerHTML = '<option value="">— Ээлжит хичээл сонгоно уу —</option>';
   lessSel.disabled = true;
   lessSection.style.display = 'none';
-
-  if (!idx || !grade || !subject) return;
-
+  if (idx === '' || !grade || !subject) return;
   const lessons = CURRICULUM[grade].subjects[subject].units[idx].lessons;
   lessons.forEach(l => {
     const o = document.createElement('option');
@@ -310,7 +313,7 @@ function onUnitChange() {
     lessSel.appendChild(o);
   });
   lessSel.disabled = false;
-  lessSection.style.display = 'flex'; // Ээлжит section гарч ирнэ
+  lessSection.style.display = 'flex';
 }
 
 // ================================================================
@@ -318,13 +321,11 @@ function onUnitChange() {
 // ================================================================
 function resetTopics() {
   const u = document.getElementById('unitSelect');
-  u.innerHTML = '<option value="">— Нэгж сонгоно уу —</option>';
+  u.innerHTML = '<option value="">— Эхлээд хичээл сонгоно уу —</option>';
   u.disabled = true;
-
   const ls = document.getElementById('lessonSelect');
   ls.innerHTML = '<option value="">— Ээлжит хичээл сонгоно уу —</option>';
   ls.disabled = true;
-
   document.getElementById('lessonSection').style.display = 'none';
 }
 
@@ -334,27 +335,22 @@ function resetTopics() {
 function getTopicInfo() {
   const custom = document.getElementById('topicCustom').value.trim();
   if (custom) return { topic: custom, unitTitle: '', isEeljit: false };
-
   const grade   = document.getElementById('gradeSelect').value;
   const subject = document.getElementById('subjectSelect').value;
   if (!grade || !subject) return null;
-
-  const units   = CURRICULUM[grade].subjects[subject].units;
-  const idx     = document.getElementById('unitSelect').value;
-  const lesson  = document.getElementById('lessonSelect').value;
-
+  const units  = CURRICULUM[grade].subjects[subject].units;
+  const idx    = document.getElementById('unitSelect').value;
+  const lesson = document.getElementById('lessonSelect').value;
   if (idx === '') return null;
-
   if (lesson) {
-    // Ээлжит хичээл сонгогдсон
     return { topic: lesson, unitTitle: units[idx].title, isEeljit: true };
   } else {
-    // Зөвхөн нэгж сонгогдсон
     return { topic: units[idx].title, unitTitle: '', isEeljit: false };
   }
 }
+
 // ================================================================
-// GENERATE — /api/generate руу POST
+// GENERATE
 // ================================================================
 async function generatePlan() {
   const grade       = document.getElementById('gradeSelect').value;
@@ -365,10 +361,13 @@ async function generatePlan() {
   const teacherName = document.getElementById('teacherName').value.trim();
 
   if (!grade || !subject || !topicInfo) {
-    alert('Анги, хичээл, сэдвийг сонгоно уу!');
+    alert('Анги, хичээл болон сэдвийг сонгоно уу!');
     return;
   }
 
+  const btn = document.getElementById('generateBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span>⏳</span> Боловсруулж байна...';
   showState('loading');
 
   try {
@@ -388,27 +387,33 @@ async function generatePlan() {
       })
     });
     const data = await res.json();
-    renderPlan(data.plan, topicInfo);
+    renderPlan(data.plan, topicInfo, data.fallback);
     showState('output');
   } catch(e) {
-    alert('Алдаа гарлаа. Дахин оролдоно уу.');
+    alert('Алдаа гарлаа. Серверийн холболтыг шалгаад дахин оролдоно уу.');
     showState('empty');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<span>✦</span> AI-аар хөтөлбөр үүсгэх';
   }
 }
 
 // ================================================================
 // RENDER
 // ================================================================
-function renderPlan(plan, topicInfo) {
+function renderPlan(plan, topicInfo, isFallback) {
   const h = plan.header;
   const typeTag = topicInfo.isEeljit
     ? `<span style="font-size:10px;padding:2px 8px;border-radius:99px;background:#e8f4fd;color:#1a6fa8;font-weight:600;margin-left:8px;">Ээлжит хичээл</span>`
     : `<span style="font-size:10px;padding:2px 8px;border-radius:99px;background:#eef0ff;color:#3a52c8;font-weight:600;margin-left:8px;">Нэгж хичээл</span>`;
   const unitLine = topicInfo.isEeljit && topicInfo.unitTitle
     ? `<div style="font-size:11px;color:#8a96b0;margin-top:2px;">Нэгж: ${topicInfo.unitTitle}</div>` : '';
+  const fallbackNotice = isFallback
+    ? `<div class="fallback-notice">⚠️ AI API холбогдоогүй тул загварт суурилсан хөтөлбөр үүсгэлээ. ANTHROPIC_API_KEY тохируулбал бүрэн AI хөтөлбөр гарна.</div>` : '';
 
   document.getElementById('planContent').innerHTML = `
 <div class="plan-document">
+  ${fallbackNotice}
   <div class="doc-header">
     <div class="doc-header-top">
       <div>
@@ -432,7 +437,7 @@ function renderPlan(plan, topicInfo) {
   </div>
 
   <div class="plan-section">
-    <div class="section-header"><div class="section-num red">1</div><div class="section-title">Суралцахуйн зорилт</div></div>
+    <div class="section-header"><div class="section-num red">1</div><div class="section-title">Суралцахуйн зорилт (Bloom)</div></div>
     <div class="section-body"><div class="bloom-grid">
       <div class="bloom-card a"><div class="bloom-label">А — Мэдлэг</div><div class="bloom-name">Мэдэх (Know)</div><div class="bloom-text">${plan.objectives.A}</div></div>
       <div class="bloom-card b"><div class="bloom-label">Б — Чадвар</div><div class="bloom-name">Ойлгох (Understand)</div><div class="bloom-text">${plan.objectives.B}</div></div>
@@ -464,7 +469,7 @@ function renderPlan(plan, topicInfo) {
           <td><div class="stage-name">${s.name}</div><div class="stage-time">${s.time} мин</div></td>
           <td>${s.purpose}</td>
           <td>${(s.teacher_actions||'').replace(/\n/g,'<br>')}</td>
-          <td>${s.student_actions||''}</td>
+          <td>${(s.student_actions||'').replace(/\n/g,'<br>')}</td>
           <td>${s.assessment||''}</td>
         </tr>`).join('')}</tbody>
       </table>
@@ -483,7 +488,7 @@ function renderPlan(plan, topicInfo) {
   </div>
 
   <div style="text-align:center;padding:16px 0;font-size:11px;color:#8a96b0;">
-    БагшAI · Монгол ЕБС · 1–12-р анги · medle.mn эх сурвалжид суурилсан
+    БагшAI · Монгол ЕБС · 1–12-р анги · Anthropic Claude AI-д суурилсан
   </div>
 </div>`;
 }
