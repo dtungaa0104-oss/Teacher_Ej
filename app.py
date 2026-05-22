@@ -10,7 +10,7 @@ with open('data/curriculum.json', 'r', encoding='utf-8') as f:
 
 @app.route('/')
 def index():
-    return render_template('index.html', 
+    return render_template('index.html',
                            grades=CURRICULUM['grades'],
                            periods=CURRICULUM['periods'])
 
@@ -20,105 +20,124 @@ def get_subjects(grade):
     subjects = list(grade_data.get('subjects', {}).keys())
     return jsonify(subjects)
 
-@app.route('/api/topics/<grade>/<subject>')
-def get_topics(grade, subject):
+@app.route('/api/units/<grade>/<subject>')
+def get_units(grade, subject):
     grade_data = CURRICULUM['grades'].get(grade, {})
-    subjects = grade_data.get('subjects', {})
-    topics = subjects.get(subject, {}).get('topics', [])
-    return jsonify(topics)
+    subjects   = grade_data.get('subjects', {})
+    units = [{'title': u['title'], 'lesson_count': len(u['lessons'])}
+             for u in subjects.get(subject, {}).get('units', [])]
+    return jsonify(units)
+
+@app.route('/api/lessons/<grade>/<subject>/<int:unit_idx>')
+def get_lessons(grade, subject, unit_idx):
+    grade_data = CURRICULUM['grades'].get(grade, {})
+    units      = grade_data.get('subjects', {}).get(subject, {}).get('units', [])
+    if unit_idx >= len(units):
+        return jsonify([])
+    return jsonify(units[unit_idx]['lessons'])
 
 @app.route('/api/generate', methods=['POST'])
 def generate_plan():
     data = request.json
-    
     manager_name = data.get('manager_name', '')
-    subject = data.get('subject', '')
-    topic = data.get('topic', '')
-    grade = data.get('grade', '')
-    period = data.get('period', '40')
     teacher_name = data.get('teacher_name', '')
-    
+    subject      = data.get('subject', '')
+    topic        = data.get('topic', '')
+    unit_title   = data.get('unit_title', '')
+    is_eeljit    = data.get('is_eeljit', False)
+    grade        = data.get('grade', '')
+    period       = data.get('period', '40')
+    objectives   = data.get('objectives', '')
+
     grade_label = CURRICULUM['grades'].get(grade, {}).get('label', f'{grade}-р анги')
-    
-    try:
-        total_min = int(period)
-    except:
-        total_min = 40
-        
-    intro_time = max(5, total_min // 8)
-    explore_time = total_min // 3
-    practice_time = total_min // 4
-    elaborate_time = total_min // 6
-    evaluate_time = total_min - intro_time - explore_time - practice_time - elaborate_time
 
-    math_section = None
-    if "Математик" in subject or "Алгебр" in subject or "Геометр" in subject:
-        math_section = {
-            "example_title": f"👨‍🏫 Сурах бичгийн жишээ бодлого ({topic})",
-            "example_body": f"🧬 <b>Бодлого:</b> {topic} сэдвийн дүрмийг ашиглан дараах илэрхийллийг хялбарчлан бод.<br>"
-                            f"<i>Бодолтын алхам:</i><br>"
-                            f"1. Өгөгдсөн нөхцөлийг томьёоны дагуу анхны хэлбэрт шилжүүлэх.<br>"
-                            f"2. Үйлдлийг дэс дарааллын дагуу гүйцэтгэх.",
-            "exercises": [
-                f"1. {topic} сэдвийг бататгах үндсэн түвшний дасгал (Сурах бичгийн Бодлого №1)",
-                f"2. Логик сэтгэлгээ шаардсан ахисан түвшний даалгавар (Сурах бичгийн Бодлого №2)"
-            ]
-        }
+    plan = generate_lesson_plan(
+        manager_name=manager_name,
+        teacher_name=teacher_name,
+        subject=subject,
+        topic=topic,
+        unit_title=unit_title,
+        is_eeljit=is_eeljit,
+        grade_label=grade_label,
+        period=period,
+        objectives=objectives
+    )
+    return jsonify({'plan': plan})
 
-    plan_data = {
+
+def generate_lesson_plan(manager_name, teacher_name, subject, topic,
+                         unit_title, is_eeljit, grade_label, period, objectives):
+    period_int = int(period)
+
+    intro_time    = max(5, period_int // 8)
+    explore_time  = int(period_int * 0.35)
+    practice_time = int(period_int * 0.28)
+    evaluate_time = period_int - intro_time - explore_time - practice_time
+
+    topic_type = "Ээлжит хичээл" if is_eeljit else "Нэгж хичээл"
+
+    return {
         'header': {
-            'manager': manager_name,
-            'teacher': teacher_name,
-            'grade': grade_label,
-            'subject': subject,
-            'topic': topic,
-            'period': f"{period} минут"
+            'subject':    subject,
+            'topic':      topic,
+            'unit_title': unit_title,
+            'topic_type': topic_type,
+            'grade':      grade_label,
+            'period':     f'{period} минут',
+            'manager':    manager_name,
+            'teacher':    teacher_name
         },
         'objectives': {
-            'A': f'Сурагч "{topic}" сэдвийн ухагдахууныг таньж мэдэх, сурах бичгийн дүрмийг ойлгох.',
-            'B': f'Өгөгдсөн жишээ бодлогын алгоритмыг ашиглан {topic} дасгалыг бие даан зөв бодож сурах.',
-            'C': f'Сурсан мэдлэгээ багш болон хосын дэмжлэгтэйгээр бататгаж, практик амьдралд хэрэглэх.'
+            'A': f'Сурагч "{topic}"-ийн үндсэн ойлголт, тодорхойлолтыг мэдэж, жишээ дурдах чадвартай болно.',
+            'B': f'Сурагч "{topic}"-ийг өмнөх мэдлэгтэй холбон тайлбарлах, шинэ нөхцөлд хэрэглэж чадна.',
+            'C': f'Сурагч "{topic}"-ийн мэдлэгийг амьдралын нөхцөлд хэрэглэж, бүтээлч даалгавар гүйцэтгэх чадвартай болно.'
         },
         'design': {
-            'method': 'Судалгаанд суурилсан индуктив арга (Discovery Learning) ба Багаар хамтран суралцах техник.',
-            'tools': f'Математик сурах бичгүүд, багшийн гарын авлага, Wordwall интерактив дасгал.',
-            'engagement': 'Анги нийтээр идэвхтэй оролцох бөгөөд Explore үе шатанд 4-5 хүнтэй багт хуваагдаж дасгал ажиллана.'
+            'method':     'Discovery Learning (судалгаанд суурилсан): сурагч жишээ дүн шинжилгээгээр дүгнэлт гаргана. Cooperative Learning: хос болон бүлгийн хамтарсан суралцахуй.',
+            'tools':      f'Wordwall.net интерактив дасгал; Jamboard/Padlet бүлгийн самбар; {subject}-ийн сурах бичиг; хэлхэмж зургийн карт.',
+            'engagement': f'Сурагчид 4-5 хүний бүлгээр ширээний тогтмол байрлалаар ажиллана. "{topic}" сэдвийн хичээлд интерактив хэрэглэгдэхүүн ашиглана.'
         },
         'stages': [
             {
-                'name': 'I. ЭХЛЭЛ (ИДЭВХЖҮҮЛЭЛТ)',
-                'time': intro_time,
-                'purpose': 'Өмнөх мэдлэгийг сэргээх, сэдэл төрүүлэх',
-                'teacher_actions': 'Хичээлийн зорилгыг танилцуулна. Шинэ сэдэвтэй холбоотой өдөр тутмын амьдралын жишээ асуулт тавина.',
-                'student_actions': 'Багшийн асуултад хариулж, тархины шуурга аргаар өмнөх үзсэн хичээлээ сэргээн ярилцана.',
-                'assessment': 'Асуулт хариултын идэвхжүүлэлт'
+                'name':            'I. ЭХЛЭЛ',
+                'time':            intro_time,
+                'purpose':         'Оролцоо ба идэвхжүүлэлт',
+                'teacher_actions': f'Нээлттэй асуулт тавьж урьдчилсан мэдлэгийг идэвхжүүлнэ. "{topic}"-тай холбоотой сонирхолтой жишээ эсвэл зураг харуулна. Хичээлийн зорилтыг тодорхойлно.',
+                'student_actions': f'"{topic}"-тай холбоотой мэдлэг, туршлагаа хуваалцана. Анхны санааг тэмдэглэнэ.',
+                'assessment':      'Нээлттэй асуулт, харилцан ярилцалт'
             },
             {
-                'name': 'II. ӨРНӨЛ (ШИНЭ МЭДЛЭГ)',
-                'time': explore_time + practice_time + elaborate_time,
-                'purpose': 'Агуулгыг судлах, дадлага хийх',
-                'teacher_actions': f'Шинэ мэдлэгийн дүрмийг сурах бичгийн дагуу тайлбарлана. Дасгал, бодлогуудыг самбарт чиглүүлэн бодуулж, Wordwall дасгал нээнэ.',
-                'student_actions': 'Тэмдэглэл хөтөлнө. Хосоор болон багаар ажиллаж, өгөгдсөн даалгаврыг сурах бичгээс бие даан гүйцэтгэнэ.',
-                'assessment': 'Гүйцэтгэлийн үнэлгээ, хоорондын хяналт'
+                'name':            'II. СУДЛАЛ',
+                'time':            explore_time,
+                'purpose':         'Шинэ мэдлэг олж авах',
+                'teacher_actions': f'Explore ({int(explore_time*0.4)}мин): жишээ, нотолгоог судлуулна.\nExplain ({int(explore_time*0.3)}мин): дүгнэлтийг нэгтгэн тайлбарлана.\nGuided practice ({int(explore_time*0.3)}мин): Wordwall.net дасгал, карт ажил.',
+                'student_actions': f'Хос болон бүлгээр ажиллан "{topic}"-ийн дүрэм, шинж чанарыг нээнэ. Самбарт дүгнэлтийг бичнэ.',
+                'assessment':      'Бүлгийн танилцуулга, Wordwall дасгал'
             },
             {
-                'name': 'III. ТӨГСГӨЛ (ҮНЭЛГЭЭ)',
-                'time': evaluate_time,
-                'purpose': 'Ойлголтыг баталгаажуулах, рефлекси',
-                'teacher_actions': 'Хичээлийг нэгтгэн дүгнэж, гэрийн даалгаврыг зааварчилна. Идэвхтэй сурагчдыг үнэлнэ.',
-                'student_actions': 'Юу сурснаа "3-2-1" картаар тэмдэглэнэ. Exit ticket хуудсыг бөглөж багшид хураалгана.',
-                'assessment': '3-2-1 карт, хуудасны хураалт'
+                'name':            'III. ДАСГАЛ',
+                'time':            practice_time,
+                'purpose':         'Мэдлэг бататгах',
+                'teacher_actions': 'Дасгалын хуудас тарааж ганцаарчилсан ажил хийлгэнэ. Алдааг тухайд нь залруулж дэмжлэг үзүүлнэ.',
+                'student_actions': 'Дасгалыг ганцаарчилсан болон хосоор бөглөнө. Хариултаа харилцан шалгаж засна.',
+                'assessment':      'Дасгалын хуудас, харилцан шалгалт'
+            },
+            {
+                'name':            'IV. ДҮГНЭЛТ',
+                'time':            evaluate_time,
+                'purpose':         'Ойлголт үнэлэх',
+                'teacher_actions': 'Хичээлийн үр дүнг нэгтгэж, дараагийн холбоог тодорхойлно. Гэрийн даалгавар тайлбарлана.',
+                'student_actions': '3-2-1 карт бөглөнө (3 сурсан зүйл, 2 сонирхолтой, 1 асуулт). Exit ticket бөглөнө.',
+                'assessment':      '3-2-1 карт, Exit ticket'
             }
         ],
-        'math_section': math_section,
-        'homework': f'Сурах бичгийн арын холбогдох хуудасны дасгалыг гүйцэтгэж, жишээг хуулж ирэх.',
-        'diff': {
-            'support': 'Дэмжлэг хэрэгтэй сурагчдад хялбаршуулсан карт болон багшийн нэмэлт зааварчилгаа өгнө.',
-            'advanced': 'Дэвшилтэт сурагчдад логик сэтгэлгээ шаардсан нэмэлт бодлого, бүтээлч даалгавар өгнө.'
-        }
+        'differentiation': {
+            'support':  f'Дэмжлэг хэрэгтэй сурагчид: хялбаршуулсан жишээ, нөхөх дасгал, нэмэлт хос ажил, зурагт дэмжлэг.',
+            'advanced': f'Дэвшилтэт сурагчид: ахисан түвшний даалгавар, бүтээлч хэрэглээний жишээ гаргах, бусдад тайлбарлах, нэмэлт судалгаа.'
+        },
+        'homework': f'"{topic}"-тай холбоотой 5–7 жишээ бичиж тайлбарлах. Econtent.mn дээрх нэмэлт дасгал гүйцэтгэх.'
     }
-    
-    return jsonify(plan_data)
+
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
