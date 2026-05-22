@@ -7,209 +7,200 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#f4f6fb;--white:#fff;--border:#e2e7f0;--focus:#4f6ef7;--t1:#1a2035;--t2:#4a5578;--tm:#8a96b0;--accent:#4f6ef7;--ah:#3a5ce0;--glow:rgba(79,110,247,.15);--pw:340px;--nh:56px;}
+:root {
+  --bg-primary: #f4f6fb;
+  --bg-secondary: #ffffff;
+  --border: #e2e7f0;
+  --border-focus: #4f6ef7;
+  --text-primary: #1a2035;
+  --text-secondary: #4a5578;
+  --text-muted: #8a96b0;
+  --accent: #4f6ef7;
+  --accent-hover: #3a5ce0;
+  --accent-glow: rgba(79,110,247,0.15);
+  --panel-width: 340px;
+  --nav-height: 56px;
+}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-html,body{height:100%;font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--t1);font-size:14px;line-height:1.6;overflow:hidden;}
-/* NAV */
-.nav{position:fixed;top:0;left:0;right:0;height:var(--nh);background:var(--white);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 24px;z-index:100;box-shadow:0 1px 4px rgba(0,0,0,.06);}
-.brand{font-size:20px;font-weight:700;}.brand b{color:var(--accent);}
-.brand-sub{font-size:11px;color:var(--tm);margin-left:10px;}
-.badges{display:flex;gap:8px;}
-.badge{font-size:11px;padding:3px 10px;border-radius:100px;border:1px solid var(--border);color:var(--t2);background:var(--bg);}
-/* LAYOUT */
-.layout{display:flex;height:100vh;padding-top:var(--nh);}
-.sidebar{width:var(--pw);min-width:var(--pw);background:var(--white);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
-.sidebar-head{padding:16px 20px 12px;border-bottom:1px solid var(--border);background:#f8f9fc;font-size:11px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;color:var(--tm);}
-.form{flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:14px;}
-.form::-webkit-scrollbar{width:4px;}
-.form::-webkit-scrollbar-thumb{background:#cdd3e0;border-radius:2px;}
-/* INPUTS */
-.field{display:flex;flex-direction:column;gap:6px;}
-.lbl{font-size:10px;font-weight:600;letter-spacing:1px;color:var(--tm);text-transform:uppercase;}
-.inp,.sel,.ta{background:#f8f9fc;border:1px solid var(--border);border-radius:8px;color:var(--t1);font-family:inherit;font-size:13px;padding:9px 12px;width:100%;outline:none;transition:border-color .2s,box-shadow .2s;appearance:none;}
-.inp::placeholder,.ta::placeholder{color:var(--tm);}
-.inp:focus,.sel:focus,.ta:focus{border-color:var(--focus);box-shadow:0 0 0 3px var(--glow);background:var(--white);}
-.sel:disabled{opacity:.45;cursor:not-allowed;}
-.ta{resize:vertical;min-height:80px;}
-.sw{position:relative;}
-.sw::after{content:'';position:absolute;right:12px;top:50%;transform:translateY(-50%);width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;border-top:5px solid var(--tm);pointer-events:none;}
-/* TOPIC TABS */
-.tabs{display:flex;border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:8px;}
-.tab{flex:1;padding:9px 0;background:var(--white);border:none;font-size:12px;font-weight:600;color:var(--tm);cursor:pointer;font-family:inherit;transition:all .15s;}
-.tab:first-child{border-right:1px solid var(--border);}
-.tab.on{background:var(--accent);color:#fff;}
-.tab:hover:not(.on){background:#eef0ff;color:var(--accent);}
-.pane{display:none;flex-direction:column;gap:8px;}
-.pane.on{display:flex;}
-/* GENERATE BTN */
-.gen-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:13px;background:linear-gradient(135deg,var(--accent),#7c5af5);border:none;border-radius:10px;color:#fff;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;transition:all .3s;margin-top:4px;}
-.gen-btn:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(79,110,247,.3);}
-/* OUTPUT */
-.out{flex:1;overflow-y:auto;background:var(--bg);}
-.out::-webkit-scrollbar{width:6px;}
-.out::-webkit-scrollbar-thumb{background:#cdd3e0;border-radius:3px;}
-.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center;padding:40px;}
-.empty-ico{font-size:56px;margin-bottom:20px;opacity:.4;}
-.empty h3{font-size:22px;font-weight:600;color:var(--t2);margin-bottom:12px;}
-.empty p{font-size:14px;color:var(--tm);max-width:380px;line-height:1.7;}
-.loading{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:20px;color:var(--t2);}
-.ring{width:48px;height:48px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;}
-/* PLAN */
-.acts{position:sticky;top:0;z-index:10;display:flex;gap:8px;padding:12px 32px;background:rgba(244,246,251,.95);backdrop-filter:blur(8px);border-bottom:1px solid var(--border);}
-.act{padding:7px 16px;border-radius:7px;border:1px solid var(--border);background:var(--white);color:var(--t1);font-family:inherit;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s;}
-.act:hover{background:var(--accent);border-color:var(--accent);color:#fff;}
-.doc{max-width:820px;margin:24px auto;padding:0 32px 48px;animation:up .4s ease;}
-.dh{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:24px 28px;margin-bottom:20px;box-shadow:0 1px 4px rgba(0,0,0,.05);}
-.dh-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--border);}
-.dbadge{background:linear-gradient(135deg,var(--accent),#7c5af5);color:#fff;padding:4px 14px;border-radius:100px;font-size:11px;font-weight:600;letter-spacing:.5px;white-space:nowrap;}
-.dmeta{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
-.dmi{display:flex;flex-direction:column;gap:3px;}
-.dml{font-size:10px;font-weight:600;letter-spacing:1px;color:var(--tm);text-transform:uppercase;}
-.dmv{font-size:14px;font-weight:600;color:var(--t1);}
-.sec{background:var(--white);border:1px solid var(--border);border-radius:12px;margin-bottom:16px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.04);}
-.sec-h{display:flex;align-items:center;gap:12px;padding:14px 20px;border-bottom:1px solid var(--border);background:#f8f9fc;}
-.sn{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;}
-.sn.r{background:rgba(192,57,43,.12);color:#c0392b;}
-.sn.b{background:rgba(36,113,163,.12);color:#2471a3;}
-.sn.g{background:rgba(30,132,73,.12);color:#1e8449;}
-.sn.o{background:rgba(211,84,0,.12);color:#d35400;}
-.st{font-size:13px;font-weight:700;color:var(--t1);letter-spacing:.3px;text-transform:uppercase;}
-.sec-b{padding:20px;}
-.bloom{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
-.bc{border-radius:8px;padding:14px;border:1px solid;}
-.bc.a{background:#f0faf1;border-color:#a8d5ab;}.bc.a .bl{color:#2e7d32;}
-.bc.b{background:#eef5ff;border-color:#9ec4f5;}.bc.b .bl{color:#1565c0;}
-.bc.c{background:#fff8ee;border-color:#f5c87a;}.bc.c .bl{color:#e65100;}
-.bl{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;}
-.bn{font-size:11px;font-weight:600;color:var(--t2);margin-bottom:6px;}
-.bt{font-size:12px;color:var(--t2);line-height:1.6;}
-.dg{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
-.di{background:#f8f9fc;border-radius:8px;padding:14px;border:1px solid var(--border);}
-.dl{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--accent);margin-bottom:6px;}
-.dd{font-size:12px;color:var(--t2);line-height:1.7;}
-table.st2{width:100%;border-collapse:collapse;}
-table.st2 th{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--tm);padding:10px 12px;text-align:left;border-bottom:1px solid var(--border);background:#f8f9fc;}
-table.st2 td{padding:14px 12px;font-size:12px;color:var(--t2);vertical-align:top;border-bottom:1px solid var(--border);line-height:1.7;}
-table.st2 tr:last-child td{border-bottom:none;}
-.sname{font-weight:700;font-size:12px;color:var(--t1);white-space:nowrap;}
-.stime{font-size:11px;color:var(--tm);font-family:'IBM Plex Mono',monospace;margin-top:2px;}
-.diff{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-.dc{background:#f8f9fc;border-radius:8px;padding:14px;border:1px solid var(--border);}
-.dcl{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--tm);margin-bottom:6px;}
-.dct{font-size:12px;color:var(--t2);line-height:1.7;}
+html,body{height:100%;font-family:'IBM Plex Sans',sans-serif;background:var(--bg-primary);color:var(--text-primary);font-size:14px;line-height:1.6;overflow:hidden;}
+.navbar{position:fixed;top:0;left:0;right:0;height:var(--nav-height);background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 24px;z-index:100;box-shadow:0 1px 4px rgba(0,0,0,.06);}
+.brand-text{font-size:20px;font-weight:700;color:var(--text-primary);}
+.brand-ai{color:var(--accent);}
+.brand-sub{font-size:11px;color:var(--text-muted);margin-left:12px;}
+.nav-meta{display:flex;gap:8px;}
+.meta-badge{font-size:11px;padding:3px 10px;border-radius:100px;border:1px solid var(--border);color:var(--text-secondary);background:var(--bg-primary);}
+.main-layout{display:flex;height:100vh;padding-top:var(--nav-height);}
+.input-panel{width:var(--panel-width);min-width:var(--panel-width);background:#fff;border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+.panel-header{padding:16px 20px 12px;border-bottom:1px solid var(--border);background:#f8f9fc;}
+.panel-title{font-size:11px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;color:var(--text-muted);display:flex;align-items:center;gap:8px;}
+.form-body{flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:14px;}
+.form-body::-webkit-scrollbar{width:4px;}
+.form-body::-webkit-scrollbar-thumb{background:#cdd3e0;border-radius:2px;}
+.form-section{display:flex;flex-direction:column;gap:6px;}
+.form-label{font-size:10px;font-weight:600;letter-spacing:1px;color:var(--text-muted);text-transform:uppercase;}
+.form-input,.form-select,.form-textarea{background:#f8f9fc;border:1px solid var(--border);border-radius:8px;color:var(--text-primary);font-family:'IBM Plex Sans',sans-serif;font-size:13px;padding:9px 12px;width:100%;transition:border-color .2s,box-shadow .2s;outline:none;appearance:none;-webkit-appearance:none;}
+.form-input::placeholder,.form-textarea::placeholder{color:var(--text-muted);}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--border-focus);box-shadow:0 0 0 3px var(--accent-glow);background:#fff;}
+.form-select:disabled{opacity:.45;cursor:not-allowed;}
+.form-textarea{resize:vertical;min-height:80px;}
+.select-wrap{position:relative;}
+.select-wrap::after{content:'';position:absolute;right:12px;top:50%;transform:translateY(-50%);width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;border-top:5px solid var(--text-muted);pointer-events:none;}
+.mt-6{margin-top:6px;}
+
+
+.generate-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:13px;background:linear-gradient(135deg,var(--accent),#7c5af5);border:none;border-radius:10px;color:#fff;font-family:'IBM Plex Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all .3s;margin-top:4px;}
+.generate-btn:hover{background:linear-gradient(135deg,var(--accent-hover),#6a48e0);transform:translateY(-1px);box-shadow:0 8px 24px rgba(79,110,247,.3);}
+.output-panel{flex:1;overflow-y:auto;background:var(--bg-primary);}
+.output-panel::-webkit-scrollbar{width:6px;}
+.output-panel::-webkit-scrollbar-thumb{background:#cdd3e0;border-radius:3px;}
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center;padding:40px;}
+.empty-icon{font-size:56px;margin-bottom:20px;opacity:.4;}
+.empty-title{font-size:22px;font-weight:600;color:var(--text-secondary);margin-bottom:12px;}
+.empty-desc{font-size:14px;color:var(--text-muted);max-width:380px;line-height:1.7;}
+.loading-state{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:20px;color:var(--text-secondary);}
+.loader-ring{width:48px;height:48px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;}
+.plan-actions{position:sticky;top:0;z-index:10;display:flex;gap:8px;padding:12px 32px;background:rgba(244,246,251,.95);backdrop-filter:blur(8px);border-bottom:1px solid var(--border);}
+.action-btn{padding:7px 16px;border-radius:7px;border:1px solid var(--border);background:#fff;color:var(--text-primary);font-family:'IBM Plex Sans',sans-serif;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s;}
+.action-btn:hover{background:var(--accent);border-color:var(--accent);color:#fff;}
+.action-btn.secondary:hover{background:#f0f2f5;}
+.plan-document{max-width:820px;margin:24px auto;padding:0 32px 48px;animation:slideUp .4s ease;}
+.doc-header{background:#fff;border:1px solid var(--border);border-radius:12px;padding:24px 28px;margin-bottom:20px;box-shadow:0 1px 4px rgba(0,0,0,.05);}
+.doc-header-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--border);}
+.doc-badge{background:linear-gradient(135deg,var(--accent),#7c5af5);color:#fff;padding:4px 14px;border-radius:100px;font-size:11px;font-weight:600;letter-spacing:.5px;white-space:nowrap;}
+.doc-meta-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
+.doc-meta-item{display:flex;flex-direction:column;gap:3px;}
+.doc-meta-label{font-size:10px;font-weight:600;letter-spacing:1px;color:var(--text-muted);text-transform:uppercase;}
+.doc-meta-value{font-size:14px;font-weight:600;color:var(--text-primary);}
+.plan-section{background:#fff;border:1px solid var(--border);border-radius:12px;margin-bottom:16px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.04);}
+.section-header{display:flex;align-items:center;gap:12px;padding:14px 20px;border-bottom:1px solid var(--border);background:#f8f9fc;}
+.section-num{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;}
+.section-num.red{background:rgba(192,57,43,.12);color:#c0392b;}
+.section-num.blue{background:rgba(36,113,163,.12);color:#2471a3;}
+.section-num.green{background:rgba(30,132,73,.12);color:#1e8449;}
+.section-num.orange{background:rgba(211,84,0,.12);color:#d35400;}
+.section-title{font-size:13px;font-weight:700;color:var(--text-primary);letter-spacing:.3px;text-transform:uppercase;}
+.section-body{padding:20px;}
+.bloom-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.bloom-card{border-radius:8px;padding:14px;border:1px solid;}
+.bloom-card.a{background:#f0faf1;border-color:#a8d5ab;}
+.bloom-card.b{background:#eef5ff;border-color:#9ec4f5;}
+.bloom-card.c{background:#fff8ee;border-color:#f5c87a;}
+.bloom-label{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;}
+.bloom-card.a .bloom-label{color:#2e7d32;}
+.bloom-card.b .bloom-label{color:#1565c0;}
+.bloom-card.c .bloom-label{color:#e65100;}
+.bloom-name{font-size:11px;font-weight:600;color:var(--text-secondary);margin-bottom:6px;}
+.bloom-text{font-size:12px;color:var(--text-secondary);line-height:1.6;}
+.design-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+.design-item{background:#f8f9fc;border-radius:8px;padding:14px;border:1px solid var(--border);}
+.design-item-label{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--accent);margin-bottom:6px;}
+.design-item-text{font-size:12px;color:var(--text-secondary);line-height:1.7;}
+.stages-table{width:100%;border-collapse:collapse;}
+.stages-table th{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--text-muted);padding:10px 12px;text-align:left;border-bottom:1px solid var(--border);background:#f8f9fc;}
+.stages-table td{padding:14px 12px;font-size:12px;color:var(--text-secondary);vertical-align:top;border-bottom:1px solid var(--border);line-height:1.7;}
+.stages-table tr:last-child td{border-bottom:none;}
+.stage-name{font-weight:700;font-size:12px;color:var(--text-primary);white-space:nowrap;}
+.stage-time{font-size:11px;color:var(--text-muted);font-family:'IBM Plex Mono',monospace;margin-top:2px;}
+.diff-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.diff-card{background:#f8f9fc;border-radius:8px;padding:14px;border:1px solid var(--border);}
+.diff-label{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px;}
+.diff-text{font-size:12px;color:var(--text-secondary);line-height:1.7;}
 .hidden{display:none!important;}
+@keyframes slideUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
 @keyframes spin{to{transform:rotate(360deg);}}
-@keyframes up{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
 @media print{
-  body{background:#fff!important;overflow:auto!important;}
-  .nav,.sidebar,.acts{display:none!important;}
-  .layout{padding-top:0;height:auto;display:block;}
-  .out{overflow:visible;background:#fff;}
-  .doc{max-width:100%;margin:0;padding:10mm 15mm;}
-  .dh{background:#f5f5f5!important;border:2px solid #333!important;}
-  .sec{background:#fff!important;border:1px solid #ccc!important;break-inside:avoid;}
-  .sec-h{background:#f0f0f0!important;}
-  .bc,.di,.dc{background:#f9f9f9!important;}
-  table.st2 th{background:#eee!important;border:1px solid #ccc;}
-  table.st2 td{border:1px solid #ddd;}
+  body{background:#fff!important;color:#000!important;overflow:auto!important;}
+  .navbar,.input-panel,.plan-actions{display:none!important;}
+  .main-layout{padding-top:0;height:auto;display:block;}
+  .output-panel{overflow:visible;background:#fff;}
+  .plan-document{max-width:100%;margin:0;padding:10mm 15mm;}
+  .doc-header{background:#f5f5f5!important;border:2px solid #333!important;}
+  .plan-section{background:#fff!important;border:1px solid #ccc!important;break-inside:avoid;}
+  .section-header{background:#f0f0f0!important;}
+  .bloom-card,.design-item,.diff-card{background:#f9f9f9!important;}
+  .stages-table th{background:#eee!important;border:1px solid #ccc;}
+  .stages-table td{border:1px solid #ddd;}
 }
 </style>
 </head>
 <body>
 
-<nav class="nav">
-  <div style="display:flex;align-items:baseline;">
-    <span class="brand">Багш<b>AI</b></span>
+<nav class="navbar">
+  <div style="display:flex;align-items:baseline;gap:4px;">
+    <span class="brand-text">Багш<span class="brand-ai">AI</span></span>
     <span class="brand-sub">ЕБС-ийн хичээлийн хөтөлбөр боловсруулагч</span>
   </div>
-  <div class="badges">
-    <span class="badge">🇲🇳 Монгол хэл</span>
-    <span class="badge">1–12-р анги</span>
-    <span class="badge">A4 хэвлэх</span>
+  <div class="nav-meta">
+    <span class="meta-badge">🇲🇳 Монгол хэл</span>
+    <span class="meta-badge">1–12-р анги</span>
+    <span class="meta-badge">A4 хэвлэх</span>
   </div>
 </nav>
 
-<main class="layout">
-  <aside class="sidebar">
-    <div class="sidebar-head">📋 Хичээлийн мэдээлэл</div>
-    <div class="form">
+<main class="main-layout">
+  <aside class="input-panel">
+    <div class="panel-header">
+      <div class="panel-title">📋 Хичээлийн мэдээлэл</div>
+    </div>
+    <div class="form-body">
 
-      <div class="field">
-        <label class="lbl">Сургалтын менежерийн нэр</label>
-        <input id="iManager" class="inp" placeholder="Жишээ нь: Б.Цэцэг">
+      <div class="form-section">
+        <label class="form-label">Сургалтын менежерийн нэр</label>
+        <input type="text" id="managerName" class="form-input" placeholder="Жишээ нь: Б.Цэцэг">
       </div>
 
-      <div class="field">
-        <label class="lbl">Багшийн нэр</label>
-        <input id="iTeacher" class="inp" placeholder="Жишээ нь: Д.Бат">
+      <div class="form-section">
+        <label class="form-label">Багшийн нэр</label>
+        <input type="text" id="teacherName" class="form-input" placeholder="Жишээ нь: Д.Бат">
       </div>
 
-      <div class="field">
-        <label class="lbl">Анги</label>
-        <div class="sw">
-          <select id="sGrade" class="sel" onchange="onGrade()">
+      <div class="form-section">
+        <label class="form-label">Анги</label>
+        <div class="select-wrap">
+          <select id="gradeSelect" class="form-select" onchange="onGradeChange()">
             <option value="">— Сонгох —</option>
-            {% for gn, gd in grades.items() %}
-            <option value="{{ gn }}">{{ gd.label }}</option>
+            {% for grade_num, grade_data in grades.items() %}
+            <option value="{{ grade_num }}">{{ grade_data.label }}</option>
             {% endfor %}
           </select>
         </div>
       </div>
 
-      <div class="field">
-        <label class="lbl">Хичээлийн нэр</label>
-        <div class="sw">
-          <select id="sSubject" class="sel" onchange="onSubject()" disabled>
+      <div class="form-section">
+        <label class="form-label">Хичээлийн нэр</label>
+        <div class="select-wrap">
+          <select id="subjectSelect" class="form-select" onchange="onSubjectChange()" disabled>
             <option value="">— Эхлээд анги сонгоно уу —</option>
           </select>
         </div>
       </div>
 
-      <!-- ═══ ХИЧЭЭЛИЙН СЭДЭВ ═══ -->
-      <div class="field">
-        <label class="lbl">Хичээлийн сэдэв</label>
-
-        <div class="tabs">
-          <button class="tab on" id="tNegj" onclick="toTab('negj')">📚 Нэгж хичээл</button>
-          <button class="tab"    id="tEelj" onclick="toTab('eelj')">📖 Ээлжит хичээл</button>
+      <!-- ══════════════════════════════════════════
+           ХИЧЭЭЛИЙН СЭДЭВ: НЭГЖ → ЭЭЛЖИТ
+      ══════════════════════════════════════════ -->
+      <div class="form-section">
+        <label class="form-label">Нэгж хичээлийн сэдэв</label>
+        <div class="select-wrap">
+          <select id="unitSelect" class="form-select" onchange="onUnitChange()" disabled>
+            <option value="">— Нэгж сонгоно уу —</option>
+          </select>
         </div>
-
-        <!-- НЭГЖ ТАБ: зөвхөн нэгж сонгоно -->
-        <div class="pane on" id="pNegj">
-          <div class="sw">
-            <select id="sUnit" class="sel" disabled>
-              <option value="">— Нэгж сонгоно уу —</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- ЭЭЛЖИТ ТАБ: нэгж → ээлжит дараалал -->
-        <div class="pane" id="pEelj">
-          <!-- Алхам 1: Нэгж -->
-          <div class="sw">
-            <select id="sUnit2" class="sel" onchange="onUnit2()" disabled>
-              <option value="">— Нэгж сонгоно уу —</option>
-            </select>
-          </div>
-          <!-- Алхам 2: Ээлжит — нэгж сонгогдсоны дараа л харагдана -->
-          <div id="dLesson" style="display:none;margin-top:8px;">
-            <div class="sw">
-              <select id="sLesson" class="sel" disabled>
-                <option value="">— Ээлжит хичээл сонгоно уу —</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        <input id="iCustom" class="inp" style="margin-top:8px;"
-               placeholder="Эсвэл өөрийн сэдэв бичнэ үү...">
       </div>
-      <!-- ═══════════════════════ -->
 
-      <div class="field">
-        <label class="lbl">Хугацаа</label>
-        <div class="sw">
-          <select id="sPeriod" class="sel">
+      <div class="form-section" id="lessonSection" style="display:none;">
+        <label class="form-label">Ээлжит хичээлийн сэдэв</label>
+        <div class="select-wrap">
+          <select id="lessonSelect" class="form-select" disabled>
+            <option value="">— Ээлжит хичээл сонгоно уу —</option>
+          </select>
+        </div>
+      </div>
+      <!-- ══════════════════════════════════════════ -->
+
+      <div class="form-section">
+        <label class="form-label">Хугацаа</label>
+        <div class="select-wrap">
+          <select id="periodSelect" class="form-select">
             {% for p in periods %}
             <option value="{{ p }}">{{ p }} минут{% if p in ['80','90'] %} (давхар){% endif %}</option>
             {% endfor %}
@@ -217,245 +208,251 @@ table.st2 tr:last-child td{border-bottom:none;}
         </div>
       </div>
 
-      <div class="field">
-        <label class="lbl">Суралцахуйн зорилт (нэмэлт)</label>
-        <textarea id="iObj" class="ta" rows="3"
+      <div class="form-section">
+        <label class="form-label">Суралцахуйн зорилт (нэмэлт)</label>
+        <textarea id="objectives" class="form-textarea" rows="3"
           placeholder="Сурагч энэ хичээлийн дараа юуг мэдэж, хийж чадах болох..."></textarea>
       </div>
 
-      <button class="gen-btn" onclick="doGenerate()">✦ AI-аар хөтөлбөр үүсгэх</button>
+      <button class="generate-btn" onclick="generatePlan()">
+        <span>✦</span> AI-аар хөтөлбөр үүсгэх
+      </button>
 
     </div>
   </aside>
 
-  <section class="out">
-    <div class="empty" id="stEmpty">
-      <div class="empty-ico">📄</div>
-      <h3>Хөтөлбөр үүсгэхэд бэлэн</h3>
-      <p>Зүүн талын маягтыг бөглөөд товч дарна уу.<br>A4 хэвлэхэд бэлэн хөтөлбөр хэдэн секундэд гарна.</p>
+  <section class="output-panel">
+    <div class="empty-state" id="emptyState">
+      <div class="empty-icon">📄</div>
+      <h3 class="empty-title">Хөтөлбөр үүсгэхэд бэлэн</h3>
+      <p class="empty-desc">Зүүн талын маягтыг бөглөөд товч дарна уу.<br>
+        A4 хэвлэхэд бэлэн хөтөлбөр хэдэн секундэд гарна.</p>
     </div>
-    <div class="loading hidden" id="stLoad">
-      <div class="ring"></div>
+    <div class="loading-state hidden" id="loadingState">
+      <div class="loader-ring"></div>
       <p>Хөтөлбөр боловсруулж байна...</p>
     </div>
-    <div class="hidden" id="stPlan">
-      <div class="acts">
-        <button class="act" onclick="window.print()">🖨️ Хэвлэх</button>
-        <button class="act" id="btnCopy" onclick="doCopy()">📋 Хуулах</button>
-        <button class="act" onclick="doReset()">🔄 Шинэчлэх</button>
+    <div class="hidden" id="planOutput">
+      <div class="plan-actions">
+        <button class="action-btn" onclick="window.print()">🖨️ Хэвлэх</button>
+        <button class="action-btn" onclick="copyText(event)">📋 Хуулах</button>
+        <button class="action-btn secondary" onclick="resetForm()">🔄 Шинэчлэх</button>
       </div>
-      <div id="planHtml"></div>
+      <div id="planContent"></div>
     </div>
   </section>
 </main>
 
 <script>
-// ── өгөгдөл ──────────────────────────────────────────
-const CUR = {{ grades | tojson }};
-let TAB = 'negj'; // идэвхтэй таб
+// ================================================================
+// CURRICULUM DATA — Flask Jinja2-аар дамжуулна
+// ================================================================
+const CURRICULUM = {{ grades | tojson }};
 
-// ── хэрэгслүүд ───────────────────────────────────────
-const $ = id => document.getElementById(id);
-
-function showState(s) {
-  ['stEmpty','stLoad','stPlan'].forEach(id => $(id).classList.add('hidden'));
-  $(s).classList.remove('hidden');
-}
-
-// ── АНГИ сонгоход ХИЧЭЭЛ populate ───────────────────
-function onGrade() {
-  const g = $('sGrade').value;
-  const ss = $('sSubject');
-  ss.innerHTML = '<option value="">— Сонгох —</option>';
-  ss.disabled = !g;
-  clearTopics();
-  if (!g) return;
-  Object.keys(CUR[g].subjects).forEach(s => {
-    ss.add(new Option(s, s));
+// ================================================================
+// GRADE → SUBJECT
+// ================================================================
+function onGradeChange() {
+  const grade = document.getElementById('gradeSelect').value;
+  const subSel = document.getElementById('subjectSelect');
+  subSel.innerHTML = '<option value="">— Сонгох —</option>';
+  subSel.disabled = !grade;
+  resetTopics();
+  if (!grade) return;
+  Object.keys(CURRICULUM[grade].subjects).forEach(s => {
+    const o = document.createElement('option');
+    o.value = s; o.textContent = s;
+    subSel.appendChild(o);
   });
 }
 
-// ── ХИЧЭЭЛ сонгоход НЭГЖ populate (2 таб тусад нь) ──
-function onSubject() {
-  clearTopics();
-  const g = $('sGrade').value;
-  const s = $('sSubject').value;
-  if (!g || !s) return;
+// ================================================================
+// SUBJECT → НЭГЖ
+// ================================================================
+function onSubjectChange() {
+  resetTopics();
+  const grade   = document.getElementById('gradeSelect').value;
+  const subject = document.getElementById('subjectSelect').value;
+  if (!grade || !subject) return;
 
-  const units = CUR[g].subjects[s].units;
-
-  // Нэгж таб — sUnit
-  const su = $('sUnit');
-  su.innerHTML = '<option value="">— Нэгж сонгоно уу —</option>';
-  units.forEach((u, i) => su.add(new Option(u.title, i)));
-  su.disabled = false;
-
-  // Ээлжит таб — sUnit2 (зөвхөн нэгж сонгуулна, ээлжит дараа нь)
-  const su2 = $('sUnit2');
-  su2.innerHTML = '<option value="">— Нэгж сонгоно уу —</option>';
-  units.forEach((u, i) => su2.add(new Option(u.title, i)));
-  su2.disabled = false;
+  const units = CURRICULUM[grade].subjects[subject].units;
+  const u = document.getElementById('unitSelect');
+  u.innerHTML = '<option value="">— Нэгж сонгоно уу —</option>';
+  units.forEach((unit, i) => {
+    const o = document.createElement('option');
+    o.value = i; o.textContent = unit.title;
+    u.appendChild(o);
+  });
+  u.disabled = false;
 }
 
-// ── ЭЭЛЖИТ TAБ: нэгж сонгогдоход ээлжит гарч ирнэ ──
-function onUnit2() {
-  const g   = $('sGrade').value;
-  const s   = $('sSubject').value;
-  const idx = $('sUnit2').value;
-  const sl  = $('sLesson');
-  const dl  = $('dLesson');
+// ================================================================
+// НЭГЖ СОНГОГДСОНЫ ДАРАА → ЭЭЛЖИТ ГАРНА
+// ================================================================
+function onUnitChange() {
+  const grade   = document.getElementById('gradeSelect').value;
+  const subject = document.getElementById('subjectSelect').value;
+  const idx     = document.getElementById('unitSelect').value;
 
-  sl.innerHTML = '<option value="">— Ээлжит хичээл сонгоно уу —</option>';
-  sl.disabled  = true;
-  dl.style.display = 'none';
+  const lessSel     = document.getElementById('lessonSelect');
+  const lessSection = document.getElementById('lessonSection');
 
-  if (idx === '' || !g || !s) return;
+  lessSel.innerHTML = '<option value="">— Ээлжит хичээл сонгоно уу —</option>';
+  lessSel.disabled = true;
+  lessSection.style.display = 'none';
 
-  const lessons = CUR[g].subjects[s].units[idx].lessons;
-  lessons.forEach(l => sl.add(new Option(l, l)));
-  sl.disabled = false;
-  dl.style.display = 'block'; // ← нэгж сонгогдсоны дараа л харагдана
+  if (!idx || !grade || !subject) return;
+
+  const lessons = CURRICULUM[grade].subjects[subject].units[idx].lessons;
+  lessons.forEach(l => {
+    const o = document.createElement('option');
+    o.value = l; o.textContent = l;
+    lessSel.appendChild(o);
+  });
+  lessSel.disabled = false;
+  lessSection.style.display = 'flex'; // Ээлжит section гарч ирнэ
 }
 
-// ── ТАБ солих ────────────────────────────────────────
-function toTab(t) {
-  TAB = t;
-  $('tNegj').classList.toggle('on', t === 'negj');
-  $('tEelj').classList.toggle('on', t === 'eelj');
-  $('pNegj').classList.toggle('on', t === 'negj');
-  $('pEelj').classList.toggle('on', t === 'eelj');
+// ================================================================
+// RESET
+// ================================================================
+function resetTopics() {
+  const u = document.getElementById('unitSelect');
+  u.innerHTML = '<option value="">— Нэгж сонгоно уу —</option>';
+  u.disabled = true;
 
-  // Солигдох үед нөгөө табын утгыг цэвэрлэ
-  if (t === 'negj') {
-    $('sUnit2').value = '';
-    $('sLesson').innerHTML = '<option value="">— Ээлжит хичээл сонгоно уу —</option>';
-    $('sLesson').disabled = true;
-    $('dLesson').style.display = 'none';
+  const ls = document.getElementById('lessonSelect');
+  ls.innerHTML = '<option value="">— Ээлжит хичээл сонгоно уу —</option>';
+  ls.disabled = true;
+
+  document.getElementById('lessonSection').style.display = 'none';
+}
+
+// ================================================================
+// СОНГОСОН СЭДЭВ АВАХ
+// ================================================================
+function getTopicInfo() {
+  const custom = document.getElementById('topicCustom').value.trim();
+  if (custom) return { topic: custom, unitTitle: '', isEeljit: false };
+
+  const grade   = document.getElementById('gradeSelect').value;
+  const subject = document.getElementById('subjectSelect').value;
+  if (!grade || !subject) return null;
+
+  const units   = CURRICULUM[grade].subjects[subject].units;
+  const idx     = document.getElementById('unitSelect').value;
+  const lesson  = document.getElementById('lessonSelect').value;
+
+  if (idx === '') return null;
+
+  if (lesson) {
+    // Ээлжит хичээл сонгогдсон
+    return { topic: lesson, unitTitle: units[idx].title, isEeljit: true };
   } else {
-    $('sUnit').value = '';
+    // Зөвхөн нэгж сонгогдсон
+    return { topic: units[idx].title, unitTitle: '', isEeljit: false };
   }
 }
+// ================================================================
+// GENERATE — /api/generate руу POST
+// ================================================================
+async function generatePlan() {
+  const grade       = document.getElementById('gradeSelect').value;
+  const subject     = document.getElementById('subjectSelect').value;
+  const topicInfo   = getTopicInfo();
+  const period      = document.getElementById('periodSelect').value;
+  const managerName = document.getElementById('managerName').value.trim();
+  const teacherName = document.getElementById('teacherName').value.trim();
 
-// ── цэвэрлэх ─────────────────────────────────────────
-function clearTopics() {
-  $('sUnit').innerHTML  = '<option value="">— Нэгж сонгоно уу —</option>';
-  $('sUnit').disabled   = true;
-  $('sUnit2').innerHTML = '<option value="">— Нэгж сонгоно уу —</option>';
-  $('sUnit2').disabled  = true;
-  $('sLesson').innerHTML = '<option value="">— Ээлжит хичээл сонгоно уу —</option>';
-  $('sLesson').disabled  = true;
-  $('dLesson').style.display = 'none';
-}
-
-// ── сонгосон сэдэв авах ──────────────────────────────
-function getTopic() {
-  const custom = $('iCustom').value.trim();
-  if (custom) return { topic: custom, unit: '', isE: false };
-
-  const g = $('sGrade').value;
-  const s = $('sSubject').value;
-  if (!g || !s) return null;
-
-  const units = CUR[g].subjects[s].units;
-
-  if (TAB === 'negj') {
-    const idx = $('sUnit').value;
-    if (idx === '') return null;
-    return { topic: units[idx].title, unit: '', isE: false };
-  } else {
-    const idx    = $('sUnit2').value;
-    const lesson = $('sLesson').value;
-    if (idx === '' || !lesson) return null;
-    return { topic: lesson, unit: units[idx].title, isE: true };
+  if (!grade || !subject || !topicInfo) {
+    alert('Анги, хичээл, сэдвийг сонгоно уу!');
+    return;
   }
-}
 
-// ── хөтөлбөр үүсгэх ──────────────────────────────────
-async function doGenerate() {
-  const g   = $('sGrade').value;
-  const s   = $('sSubject').value;
-  const ti  = getTopic();
-  const per = $('sPeriod').value;
-  const mgr = $('iManager').value.trim();
-  const tch = $('iTeacher').value.trim();
+  showState('loading');
 
-  if (!g || !s || !ti) { alert('Анги, хичээл, сэдвийг сонгоно уу!'); return; }
-
-  showState('stLoad');
   try {
-    const r = await fetch('/api/generate', {
+    const res = await fetch('/api/generate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        manager_name: mgr, teacher_name: tch,
-        subject: s, topic: ti.topic, unit_title: ti.unit,
-        is_eeljit: ti.isE, grade: g, period: per,
-        objectives: $('iObj').value
+        manager_name: managerName,
+        teacher_name: teacherName,
+        subject:      subject,
+        topic:        topicInfo.topic,
+        unit_title:   topicInfo.unitTitle,
+        is_eeljit:    topicInfo.isEeljit,
+        grade:        grade,
+        period:       period,
+        objectives:   document.getElementById('objectives').value
       })
     });
-    const d = await r.json();
-    renderPlan(d.plan, ti);
-    showState('stPlan');
+    const data = await res.json();
+    renderPlan(data.plan, topicInfo);
+    showState('output');
   } catch(e) {
     alert('Алдаа гарлаа. Дахин оролдоно уу.');
-    showState('stEmpty');
+    showState('empty');
   }
 }
 
-// ── дүрслэх ───────────────────────────────────────────
-function renderPlan(p, ti) {
-  const h = p.header;
-  const tag = ti.isE
+// ================================================================
+// RENDER
+// ================================================================
+function renderPlan(plan, topicInfo) {
+  const h = plan.header;
+  const typeTag = topicInfo.isEeljit
     ? `<span style="font-size:10px;padding:2px 8px;border-radius:99px;background:#e8f4fd;color:#1a6fa8;font-weight:600;margin-left:8px;">Ээлжит хичээл</span>`
     : `<span style="font-size:10px;padding:2px 8px;border-radius:99px;background:#eef0ff;color:#3a52c8;font-weight:600;margin-left:8px;">Нэгж хичээл</span>`;
-  const uline = ti.isE && ti.unit
-    ? `<div style="font-size:11px;color:#8a96b0;margin-top:2px;">Нэгж: ${ti.unit}</div>` : '';
+  const unitLine = topicInfo.isEeljit && topicInfo.unitTitle
+    ? `<div style="font-size:11px;color:#8a96b0;margin-top:2px;">Нэгж: ${topicInfo.unitTitle}</div>` : '';
 
-  $('planHtml').innerHTML = `
-<div class="doc">
-  <div class="dh">
-    <div class="dh-top">
+  document.getElementById('planContent').innerHTML = `
+<div class="plan-document">
+  <div class="doc-header">
+    <div class="doc-header-top">
       <div>
         <div style="font-size:11px;color:#8a96b0;margin-bottom:4px;">
-          ${h.manager?`Сургалтын менежер: <strong>${h.manager}</strong>`:''}
-          ${h.teacher?` &nbsp;|&nbsp; Багш: <strong>${h.teacher}</strong>`:''}
+          ${h.manager ? `Сургалтын менежер: <strong style="color:#1a2035">${h.manager}</strong>` : ''}
+          ${h.teacher ? ` &nbsp;|&nbsp; Багш: <strong style="color:#1a2035">${h.teacher}</strong>` : ''}
         </div>
         <div style="font-size:18px;font-weight:700;display:flex;align-items:center;flex-wrap:wrap;gap:6px;">
-          ${h.subject} — ${h.topic} ${tag}
-        </div>${uline}
+          ${h.subject} — ${h.topic} ${typeTag}
+        </div>
+        ${unitLine}
       </div>
-      <div class="dbadge">ХИЧЭЭЛИЙН ХӨТӨЛБӨР</div>
+      <div class="doc-badge">ХИЧЭЭЛИЙН ХӨТӨЛБӨР</div>
     </div>
-    <div class="dmeta">
-      <div class="dmi"><span class="dml">Хичээл</span><span class="dmv">${h.subject}</span></div>
-      <div class="dmi"><span class="dml">Анги</span><span class="dmv">${h.grade}</span></div>
-      <div class="dmi"><span class="dml">Сэдэв</span><span class="dmv" style="font-size:12px;">${h.topic}</span></div>
-      <div class="dmi"><span class="dml">Хугацаа</span><span class="dmv">${h.period}</span></div>
+    <div class="doc-meta-grid">
+      <div class="doc-meta-item"><span class="doc-meta-label">Хичээл</span><span class="doc-meta-value">${h.subject}</span></div>
+      <div class="doc-meta-item"><span class="doc-meta-label">Анги</span><span class="doc-meta-value">${h.grade}</span></div>
+      <div class="doc-meta-item"><span class="doc-meta-label">Сэдэв</span><span class="doc-meta-value" style="font-size:12px;">${h.topic}</span></div>
+      <div class="doc-meta-item"><span class="doc-meta-label">Хугацаа</span><span class="doc-meta-value">${h.period}</span></div>
     </div>
   </div>
 
-  <div class="sec">
-    <div class="sec-h"><div class="sn r">1</div><div class="st">Суралцахуйн зорилт</div></div>
-    <div class="sec-b"><div class="bloom">
-      <div class="bc a"><div class="bl">А — Мэдлэг</div><div class="bn">Мэдэх (Know)</div><div class="bt">${p.objectives.A}</div></div>
-      <div class="bc b"><div class="bl">Б — Чадвар</div><div class="bn">Ойлгох (Understand)</div><div class="bt">${p.objectives.B}</div></div>
-      <div class="bc c"><div class="bl">В — Бүтээлч</div><div class="bn">Хэрэглэх (Apply)</div><div class="bt">${p.objectives.C}</div></div>
+  <div class="plan-section">
+    <div class="section-header"><div class="section-num red">1</div><div class="section-title">Суралцахуйн зорилт</div></div>
+    <div class="section-body"><div class="bloom-grid">
+      <div class="bloom-card a"><div class="bloom-label">А — Мэдлэг</div><div class="bloom-name">Мэдэх (Know)</div><div class="bloom-text">${plan.objectives.A}</div></div>
+      <div class="bloom-card b"><div class="bloom-label">Б — Чадвар</div><div class="bloom-name">Ойлгох (Understand)</div><div class="bloom-text">${plan.objectives.B}</div></div>
+      <div class="bloom-card c"><div class="bloom-label">В — Бүтээлч</div><div class="bloom-name">Хэрэглэх (Apply)</div><div class="bloom-text">${plan.objectives.C}</div></div>
     </div></div>
   </div>
 
-  <div class="sec">
-    <div class="sec-h"><div class="sn b">2</div><div class="st">Хичээлийн бэлтгэл ба дизайн</div></div>
-    <div class="sec-b"><div class="dg">
-      <div class="di"><div class="dl">Арга зүй</div><div class="dd">${p.design.method}</div></div>
-      <div class="di"><div class="dl">Хэрэглэгдэхүүн & Цахим</div><div class="dd">${p.design.tools}</div></div>
-      <div class="di"><div class="dl">Ангийн зохион байгуулалт</div><div class="dd">${p.design.engagement}</div></div>
+  <div class="plan-section">
+    <div class="section-header"><div class="section-num blue">2</div><div class="section-title">Хичээлийн бэлтгэл ба дизайн</div></div>
+    <div class="section-body"><div class="design-grid">
+      <div class="design-item"><div class="design-item-label">Арга зүй</div><div class="design-item-text">${plan.design.method}</div></div>
+      <div class="design-item"><div class="design-item-label">Хэрэглэгдэхүүн & Цахим</div><div class="design-item-text">${plan.design.tools}</div></div>
+      <div class="design-item"><div class="design-item-label">Ангийн зохион байгуулалт</div><div class="design-item-text">${plan.design.engagement}</div></div>
     </div></div>
   </div>
 
-  <div class="sec">
-    <div class="sec-h"><div class="sn g">3</div><div class="st">Хичээлийн үйл ажиллагааны урсгал</div></div>
-    <div class="sec-b" style="padding:0;">
-      <table class="st2">
+  <div class="plan-section">
+    <div class="section-header"><div class="section-num green">3</div><div class="section-title">Хичээлийн үйл ажиллагааны урсгал</div></div>
+    <div class="section-body" style="padding:0;">
+      <table class="stages-table">
         <thead><tr>
           <th style="width:110px;">Үе шат</th>
           <th style="width:120px;">Зорилго</th>
@@ -463,8 +460,8 @@ function renderPlan(p, ti) {
           <th>Сурагчийн үйл ажиллагаа</th>
           <th style="width:130px;">Үнэлгээ</th>
         </tr></thead>
-        <tbody>${p.stages.map(s=>`<tr>
-          <td><div class="sname">${s.name}</div><div class="stime">${s.time} мин</div></td>
+        <tbody>${plan.stages.map(s => `<tr>
+          <td><div class="stage-name">${s.name}</div><div class="stage-time">${s.time} мин</div></td>
           <td>${s.purpose}</td>
           <td>${(s.teacher_actions||'').replace(/\n/g,'<br>')}</td>
           <td>${s.student_actions||''}</td>
@@ -474,13 +471,13 @@ function renderPlan(p, ti) {
     </div>
   </div>
 
-  <div class="sec">
-    <div class="sec-h"><div class="sn o">4</div><div class="st">Нэмэлт үйл ажиллагаа & Ялгавартай хандлага</div></div>
-    <div class="sec-b"><div class="diff">
-      <div class="dc"><div class="dcl">📝 Гэрийн даалгавар</div><div class="dct">${p.homework}</div></div>
-      <div class="dc"><div class="dcl">📊 Ялгавартай хандлага</div><div class="dct">
-        <strong style="color:#66bb6a;font-size:11px;">🟢 Дэмжлэг хэрэгтэй:</strong><br>${p.differentiation.support}<br><br>
-        <strong style="color:#ffa726;font-size:11px;">🟠 Дэвшилтэт:</strong><br>${p.differentiation.advanced}
+  <div class="plan-section">
+    <div class="section-header"><div class="section-num orange">4</div><div class="section-title">Нэмэлт үйл ажиллагаа & Ялгавартай хандлага</div></div>
+    <div class="section-body"><div class="diff-grid">
+      <div class="diff-card"><div class="diff-label">📝 Гэрийн даалгавар</div><div class="diff-text">${plan.homework}</div></div>
+      <div class="diff-card"><div class="diff-label">📊 Ялгавартай хандлага</div><div class="diff-text">
+        <strong style="color:#66bb6a;font-size:11px;">🟢 Дэмжлэг хэрэгтэй:</strong><br>${plan.differentiation.support}<br><br>
+        <strong style="color:#ffa726;font-size:11px;">🟠 Дэвшилтэт:</strong><br>${plan.differentiation.advanced}
       </div></div>
     </div></div>
   </div>
@@ -491,14 +488,23 @@ function renderPlan(p, ti) {
 </div>`;
 }
 
-function doCopy() {
-  navigator.clipboard.writeText($('planHtml').innerText).then(() => {
-    $('btnCopy').textContent = '✅ Хуулагдлаа!';
-    setTimeout(() => $('btnCopy').textContent = '📋 Хуулах', 2000);
+function showState(s) {
+  ['emptyState','loadingState','planOutput'].forEach(id =>
+    document.getElementById(id).classList.add('hidden'));
+  if (s === 'empty')   document.getElementById('emptyState').classList.remove('hidden');
+  if (s === 'loading') document.getElementById('loadingState').classList.remove('hidden');
+  if (s === 'output')  document.getElementById('planOutput').classList.remove('hidden');
+}
+
+function copyText(e) {
+  const btn = e.target;
+  navigator.clipboard.writeText(document.getElementById('planContent').innerText).then(() => {
+    btn.textContent = '✅ Хуулагдлаа!';
+    setTimeout(() => btn.textContent = '📋 Хуулах', 2000);
   });
 }
 
-function doReset() { showState('stEmpty'); }
+function resetForm() { showState('empty'); }
 </script>
 </body>
 </html>
